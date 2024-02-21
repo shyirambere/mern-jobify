@@ -1,4 +1,37 @@
+/* eslint-disable no-unreachable */
+import { useQuery } from "@tanstack/react-query";
+import { ChartsContainer, StatsContainer } from "../components";
+import customFetch from "../utils/customFetch";
+// eslint-disable-next-line no-unused-vars
+import { useLoaderData } from "react-router-dom";
+
+const statsQuery = {
+  queryKey: ["stats"],
+  queryFn: async () => {
+    const response = await customFetch.get("/jobs/stats");
+
+    return response.data;
+  },
+};
+
+export const loader = (queryClient) => async () => {
+  const data = await queryClient.ensureQueryData(statsQuery);
+  return data;
+  //return null;
+};
 const Stats = () => {
-  return <div>Stats</div>;
+  //const { defaultStats, monthlyApplications } = useLoaderData();
+
+  const { data } = useQuery(statsQuery);
+
+  const { defaultStats, monthlyApplications } = data;
+  return (
+    <>
+      <StatsContainer defaultStats={defaultStats} />
+      {monthlyApplications?.length > 0 && (
+        <ChartsContainer data={monthlyApplications} />
+      )}
+    </>
+  );
 };
 export default Stats;
